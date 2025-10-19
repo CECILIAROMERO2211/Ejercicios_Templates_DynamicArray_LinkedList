@@ -69,3 +69,154 @@ void DynamicArray::Append(const int value)
 bool DynamicArray::InsertarDespuesDeValor(int valorAEncontrar, int valorAInsertar)
 {
     for (int i = 0; i < count; i++) // recorre todos los elementos del arreglo
+    {
+        if (elements[i] == valorAEncontrar) // si encuentra el valor buscado
+        {
+            if (count >= capacity) // si el arreglo está lleno
+            {
+                Append(valorAInsertar); // llama a Append para redimensionar y agregar
+                return true;            // regresa true porque se insertó
+            }
+
+            // recorre todos los elementos una posición hacia la derecha
+            for (int j = count; j > i + 1; j--)
+                elements[j] = elements[j - 1];
+
+            elements[i + 1] = valorAInsertar; // coloca el nuevo valor después del encontrado
+            count++;                          // aumenta el número de elementos
+            return true;                      // termina indicando que se logró insertar
+        }
+    }
+    cout << "advertencia: no existe el valor " << valorAEncontrar << endl; // si no lo encuentra, avisa
+    return false;                    // regresa falso porque no se insertó nada
+}
+
+// función que devuelve el elemento en un índice específico
+int DynamicArray::ObtenerElemento(const size_t indice) const
+{
+    if (indice >= count)            // si el índice es mayor que el número de elementos
+    {
+        cout << "error: índice fuera de rango" << endl;
+        return -1;                  // devuelve -1 como indicador de error
+    }
+    return elements[indice];        // devuelve el valor del elemento en esa posición
+}
+
+// función que asigna un nuevo valor en un índice determinado
+void DynamicArray::AsignarElemento(const size_t indice, const int valor)
+{
+    if (indice >= count)            // valida que el índice exista
+    {
+        cout << "error: índice fuera de rango" << endl;
+        return;                     // si no, termina sin cambiar nada
+    }
+    elements[indice] = valor;       // reemplaza el valor del elemento por el nuevo
+}
+
+// busca un valor dentro del arreglo y devuelve su posición
+int DynamicArray::BuscarElemento(const int valor) const
+{
+    for (int i = 0; i < count; i++) // recorre todos los elementos
+    {
+        if (elements[i] == valor)   // si el valor coincide
+            return i;               // devuelve el índice donde lo encontró
+    }
+    return -1;                      // devuelve -1 si no se encuentra
+}
+
+// elimina el último elemento del arreglo
+int DynamicArray::QuitarUltimoElemento()
+{
+    if (count == 0)                 // si no hay elementos
+    {
+        cout << "advertencia: arreglo vacío" << endl;
+        return -1;                  // devuelve -1 indicando error
+    }
+
+    count--;                        // reduce el conteo de elementos
+    return elements[count];         // devuelve el valor eliminado
+}
+
+// devuelve cuántos elementos tiene actualmente el arreglo
+int DynamicArray::GetCount() const
+{
+    return count;                   // regresa la variable count
+}
+
+// imprime todos los elementos guardados en el arreglo
+void DynamicArray::Print() const
+{
+    cout << "elementos del arreglo: ";
+    for (int i = 0; i < count; i++) // recorre el arreglo
+        cout << elements[i] << " "; // imprime cada elemento separado por un espacio
+    cout << endl;                   // salto de línea al final
+}
+
+// sobrecarga del operador [] para acceder a elementos como si fuera un array normal
+int& DynamicArray::operator[](int index)
+{
+    if (index < 0 || index >= count) // valida que el índice sea correcto
+    {
+        cout << "error: índice fuera de rango" << endl;
+        exit(1);                     // termina el programa si el índice no es válido
+    }
+    return elements[index];          // devuelve una referencia al elemento
+}
+
+// versión constante del operador [] (para objetos constantes)
+const int& DynamicArray::operator[](int index) const
+{
+    if (index < 0 || index >= count) // valida el rango del índice
+    {
+        cout << "error: índice fuera de rango" << endl;
+        exit(1);                     // detiene el programa si hay error
+    }
+    return elements[index];          // devuelve una referencia constante al elemento
+}
+
+// función que agrega un valor al final, igual que Append
+void DynamicArray::push_back(int value)
+{
+    Append(value);                   // llama a Append internamente
+}
+
+// elimina el último elemento del arreglo sin devolverlo
+void DynamicArray::pop_back()
+{
+    if (count > 0)                   // si hay elementos
+        count--;                     // simplemente reduce el contador
+    else
+        cout << "advertencia: arreglo vacío" << endl; // avisa si no hay nada que borrar
+}
+
+// ajusta la capacidad al número exacto de elementos
+void DynamicArray::shrink_to_fit()
+{
+    // no hace nada porque solo se pide dejarla declarada
+}
+
+// función de demostración que prueba todas las funciones anteriores
+void DemostracionDynamicArray()
+{
+    DynamicArray myArray;             // crea un objeto de tipo DynamicArray
+
+    myArray.Append(10);               // agrega 10 al arreglo
+    myArray.Append(20);               // agrega 20
+    myArray.Append(30);               // agrega 30
+
+    cout << "elementos iniciales: ";
+    myArray.Print();                  // muestra los primeros elementos
+
+    myArray.push_back(40);            // agrega un nuevo elemento al final
+    myArray.Print();                  // imprime de nuevo
+
+    myArray.pop_back();               // elimina el último elemento
+    myArray.Print();                  // muestra los que quedan
+
+    cout << "primer elemento con operador []: " << myArray[0] << endl; // accede al primer valor con el operador []
+    myArray.shrink_to_fit();          // llamada vacía como parte del ejercicio
+}
+
+// Fuentes de información:
+// Cplusplus.com. (n.d.). exit – C++ Reference. Recuperado de https://cplusplus.com/reference/cstdlib/exit/
+// Deitel, P. J., & Deitel, H. M. (2016). C++ Cómo programar (10ª edición). Pearson Educación.
