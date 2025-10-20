@@ -3,43 +3,38 @@
 // Profesor: Adrián González
 // Universidad Cuauhtémoc Querétaro
 
-#include <iostream>          // se incluye para poder usar cout y endl
-#include "DynamicArray.h"    // incluye el encabezado de la clase DynamicArray
-#include "LinkedList.h"      // incluye el encabezado de la clase LinkedList
-using namespace std;         // permite usar cout sin escribir std::cout
+#include <iostream>        // Permite usar cout, endl, etc.
+#include "DynamicArray.h"  // Incluye la clase DynamicArray
+#include "LinkedList.h"    // Incluye la clase LinkedList
+using namespace std;       // Simplifica el uso del espacio de nombres estándar
 
-// declaración de la función plantilla que imprime arreglos de cualquier tipo
+// Declaración anticipada del template y función de demostración
 template <typename T>
-void PrintArray(T* array, int size);
+void PrintArray(T* array, int size); // Prototipo de la función genérica para imprimir arreglos
+void DemostracionTemplatePrintArray(); // Prototipo de la función que prueba el template
 
-// declaración de la función de demostración de templates
-void DemostracionTemplatePrintArray();
-
-// función principal donde inicia el programa
+// Función principal del programa
 int main()
 {
-    // muestra un título para la sección del arreglo dinámico
-    cout << "===== demostracion de dynamic array =====" << endl;
+    // Primera demostración: DynamicArray
+    cout << "===== demostracion de dynamic array =====" << endl; // Título
+    DemostracionDynamicArray(); // Llama a la función que prueba todas las funciones del arreglo dinámico
 
-    // llama a la función que demuestra las operaciones del DynamicArray
-    DemostracionDynamicArray();
+    // Segunda demostración: LinkedList
+    cout << endl << "===== demostracion de linked list =====" << endl; // Separador visual
+    DemostracionLinkedList(); // Llama a la función que prueba todas las funciones de la lista enlazada
 
-    // separa visualmente las demostraciones con una línea vacía
-    cout << endl << "===== demostracion de linked list =====" << endl;
+    // Tercera demostración: Template PrintArray
+    cout << endl << "===== demostracion de printarray (template) =====" << endl; // Otro separador
+    DemostracionTemplatePrintArray(); // Llama a la función que demuestra el template
 
-    // llama a la función que demuestra cómo funciona la lista enlazada
-    DemostracionLinkedList();
+    // Espera de cierre (dependiendo del sistema operativo)
+#ifdef _WIN32
+    system("pause"); // En Windows, pausa la consola hasta que se presione una tecla
+#else
+    cout << "Presiona Enter para salir..." << endl; // En Mac o Linux muestra mensaje
+    cin.get(); // Espera que el usuario presione Enter
+#endif
 
-    // imprime otro título para la parte de las funciones template
-    cout << endl << "===== demostracion de printarray (template) =====" << endl;
-
-    // llama a la función que muestra cómo se imprimen arreglos genéricos con templates
-    DemostracionTemplatePrintArray();
-
-    // mensaje final antes de terminar el programa
-    cout << endl << "presiona cualquier tecla para salir..." << endl;
-
-    system("pause"); // pausa la ejecución hasta que el usuario presione una tecla (solo en Windows)
-    
-    return 0;        // devuelve 0 indicando que el programa terminó correctamente
+    return 0; // Indica que el programa terminó correctamente
 }
