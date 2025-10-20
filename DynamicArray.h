@@ -3,46 +3,91 @@
 // Profesor: Adrián González
 // Universidad Cuauhtémoc Querétaro
 
-#pragma once                   // evita que este archivo se incluya más de una vez al compilar
-#include <iostream>            // permite usar cout, endl y otras funciones de entrada/salida
-using namespace std;           // para no tener que escribir std:: en cada línea
+#pragma once // Evita que el archivo se incluya más de una vez al compilar
+#include <iostream> // Permite usar cout, endl, etc.
+using namespace std; // Simplifica el uso del espacio de nombres std
 
-#define COUNT_DYNAMIC_ARRAY_COPIES 1 // define una constante que activa el conteo de copias (1 = activo)
+#define COUNT_DYNAMIC_ARRAY_COPIES 1 // Activa el conteo de copias dentro del arreglo dinámico
 
-// definición de la clase DynamicArray
+// Se define la clase DynamicArray
 class DynamicArray
 {
-public:                        // todo lo que va aquí puede ser usado fuera de la clase
+public: // Sección pública: accesible desde fuera de la clase
+    static const int maxCapacity = 1024; // Capacidad máxima permitida para el arreglo
 
-    static const int maxCapacity = 1024; // capacidad máxima del arreglo para evitar desbordamientos
+    DynamicArray(int capacity = 0); // Constructor que permite definir capacidad inicial
+    ~DynamicArray(); // Destructor que libera memoria al destruir el objeto
 
-    DynamicArray(int capacity = 0);      // constructor: crea el arreglo dinámico con cierta capacidad
-    ~DynamicArray();                     // destructor: libera la memoria usada por el arreglo
+    // Constructor de copia: crea un nuevo arreglo copiando otro existente
+    DynamicArray(const DynamicArray& other)
+    {
+        count = other.count; // Copia el número de elementos
+        capacity = other.capacity; // Copia la capacidad total
 
-    void Append(const int value);        // agrega un elemento al final del arreglo
-    bool InsertarDespuesDeValor(int valorAEncontrar, int valorAInsertar); // inserta un valor después de otro
-    int ObtenerElemento(const size_t indice) const;   // devuelve el elemento en un índice específico
-    void AsignarElemento(const size_t indice, const int valor); // cambia el valor en cierta posición
-    int BuscarElemento(const int valor) const;        // busca un valor dentro del arreglo
-    int QuitarUltimoElemento();                       // quita el último elemento del arreglo
-    int GetCount() const;                             // devuelve cuántos elementos hay guardados
-    void Print() const;                               // imprime todos los elementos
-    int& operator[](int index);                       // sobrecarga del operador [] para acceder a elementos
-    const int& operator[](int index) const;           // versión constante del operador []
+#if COUNT_DYNAMIC_ARRAY_COPIES != 0
+        copyCounter = other.copyCounter; // Copia también el contador de copias si está activo
+#endif
 
-    void push_back(int value);                        // agrega un elemento al final (como en std::vector)
-    void pop_back();                                  // elimina el último elemento sin devolverlo
-    void shrink_to_fit();                             // ajusta la capacidad al tamaño actual
+        // Si hay capacidad, reserva memoria para el nuevo arreglo
+        if (capacity > 0)
+        {
+            elements = new int[capacity]; // Crea espacio para todos los elementos
+            for (int i = 0; i < count; i++) // Copia los elementos uno por uno
+                elements[i] = other.elements[i];
+        }
+        else
+            elements = nullptr; // Si no hay capacidad, deja el puntero vacío
+    }
 
-private:                       // las siguientes variables solo se pueden usar dentro de la clase
-    int* elements;              // puntero que guarda la dirección del arreglo dinámico
-    int count;                  // cantidad actual de elementos en el arreglo
-    int capacity;               // capacidad total del arreglo (espacio reservado)
+    // Operador de asignación: permite igualar un DynamicArray a otro (a = b)
+    DynamicArray& operator=(const DynamicArray& other)
+    {
+        if (this != &other) // Evita la autoasignación
+        {
+            delete[] elements; // Libera la memoria existente para evitar fugas
+            count = other.count; // Copia el número de elementos
+            capacity = other.capacity; // Copia la capacidad
 
-#if COUNT_DYNAMIC_ARRAY_COPIES != 0 // si el conteo de copias está activo
-    int copyCounter;             // variable que cuenta cuántas copias se hacen al redimensionar
+#if COUNT_DYNAMIC_ARRAY_COPIES != 0
+            copyCounter = other.copyCounter; // Copia el contador de copias
+#endif
+
+            // Reserva nueva memoria y copia los datos
+            if (capacity > 0)
+            {
+                elements = new int[capacity]; // Crea nuevo arreglo con la capacidad copiada
+                for (int i = 0; i < count; i++)
+                    elements[i] = other.elements[i]; // Copia cada elemento
+            }
+            else
+                elements = nullptr; // Si no hay capacidad, deja el puntero vacío
+        }
+        return *this; // Devuelve el propio objeto actualizado
+    }
+
+    void Append(const int value); // Agrega un nuevo valor al final del arreglo
+    bool InsertarDespuesDeValor(int valorAEncontrar, int valorAInsertar); // Inserta un valor después de otro existente
+    int ObtenerElemento(const size_t indice) const; // Devuelve un elemento en un índice específico
+    void AsignarElemento(const size_t indice, const int valor); // Asigna un nuevo valor a una posición
+    int BuscarElemento(const int valor) const; // Busca un valor y devuelve su índice
+    int QuitarUltimoElemento(); // Elimina el último elemento y lo devuelve
+    int GetCount() const; // Devuelve el número de elementos actuales
+    void Print() const; // Imprime todos los elementos del arreglo
+    int& operator[](int index); // Sobrecarga del operador [] (permite acceder a elementos)
+    const int& operator[](int index) const; // Versión constante del operador []
+    void push_back(int value); // Agrega un elemento al final (como en std::vector)
+    void pop_back(); // Elimina el último elemento
+    void shrink_to_fit(); // Ajusta la capacidad al tamaño real (solo declarada)
+
+private: // Sección privada: solo accesible dentro de la clase
+    int* elements; // Puntero al bloque de memoria donde se guardan los enteros
+    int count; // Número actual de elementos
+    int capacity; // Tamaño total del arreglo reservado
+
+#if COUNT_DYNAMIC_ARRAY_COPIES != 0
+    int copyCounter; // Cuenta cuántas copias se hicieron (opcional)
 #endif
 };
 
-// declaración de una función externa que muestra cómo funciona la clase
+// Declaración de la función de demostración
 void DemostracionDynamicArray();
