@@ -3,45 +3,50 @@
 // Profesor: Adrián González
 // Universidad Cuauhtémoc Querétaro
 
-#include "LinkedList.h"   // se incluye el encabezado donde está la plantilla de la lista enlazada
-#include <iostream>       // permite usar cout y endl para imprimir en consola
-using namespace std;      // evita escribir std:: en cada instrucción
+#include "LinkedList.h" // Incluye la definición de la clase LinkedList
+#include <iostream>     // Permite usar cout para imprimir mensajes
+using namespace std;    // Simplifica el uso del espacio de nombres estándar
 
-// función que demuestra cómo funcionan las operaciones de la lista enlazada
+// Función que demuestra el uso de todas las operaciones de la lista enlazada
 void DemostracionLinkedList()
 {
-    LinkedList<string> myLinkedList;   // se crea una lista enlazada de tipo string
+    LinkedList<string> myLinkedList; // Crea una lista enlazada que almacenará cadenas (strings)
 
-    myLinkedList.PushFront("Inicio");  // inserta "Inicio" al principio de la lista
-    myLinkedList.PushFront("Primero"); // inserta "Primero" al inicio (ahora será el nuevo frente)
+    // Prueba de inserción al frente de la lista
+    myLinkedList.PushFront("Inicio");  // Inserta un nodo con el valor "Inicio" al principio
+    myLinkedList.PushFront("Primero"); // Inserta otro nodo al frente, ahora este es el nuevo primero
+    myLinkedList.Print();              // Imprime la lista actual (Primero → Inicio)
 
-    myLinkedList.Print();              // imprime la lista actual: debería mostrar "Primero Inicio"
+    // Prueba de eliminación del primer nodo
+    myLinkedList.PopFront();           // Elimina el nodo del frente (Primero)
+    myLinkedList.Print();              // Imprime la lista después de eliminar el primero (Inicio)
 
-    myLinkedList.PopFront();           // elimina el primer nodo ("Primero")
-    myLinkedList.Print();              // imprime de nuevo para ver la lista actual
+    // Pruebas de inserción al final de la lista
+    myLinkedList.Append("Juan");       // Inserta "Juan" al final de la lista
+    myLinkedList.Append("Pedro");      // Inserta "Pedro" al final
+    myLinkedList.Append("Luis");       // Inserta "Luis" al final
+    myLinkedList.Append("Maria");      // Inserta "Maria" al final
+    // En este punto, la lista contiene: Inicio → Juan → Pedro → Luis → Maria
 
-    myLinkedList.Append("Juan");       // agrega "Juan" al final de la lista
-    myLinkedList.Append("Pedro");      // agrega "Pedro" al final
-    myLinkedList.Append("Luis");       // agrega "Luis" al final
-    myLinkedList.Append("Maria");      // agrega "Maria" al final
+    // Inserta un nuevo valor después de uno existente
+    myLinkedList.InsertAfterValue("Juan", "Pepe"); // Inserta "Pepe" después de "Juan"
 
-    myLinkedList.InsertAfterValue("Juan", "Pepe"); // inserta "Pepe" después de "Juan"
+    // Prueba de funciones Front() y Back()
+    cout << myLinkedList.Front() << " es el nodo hasta el frente de la lista" << endl; // Muestra el primer nodo
+    cout << myLinkedList.Back() << " es el nodo hasta el final de la lista" << endl;   // Muestra el último nodo
 
-    // muestra cuál es el primer elemento de la lista
-    cout << myLinkedList.Front() << " es el nodo hasta el frente de la lista" << endl;
+    // Prueba de eliminación de varios nodos por su valor
+    myLinkedList.BorrarNodoPorValor("Juan");  // Elimina el nodo que contiene "Juan"
+    myLinkedList.BorrarNodoPorValor("Luis");  // Elimina "Luis"
+    myLinkedList.BorrarNodoPorValor("Maria"); // Elimina "Maria"
+    myLinkedList.BorrarNodoPorValor("Pepe");  // Elimina "Pepe"
+    myLinkedList.BorrarNodoPorValor("Pedro"); // Elimina "Pedro"
+    // En este punto, la lista solo debería contener "Inicio"
 
-    // muestra cuál es el último elemento de la lista
-    cout << myLinkedList.Back() << " es el nodo hasta el final de la lista" << endl;
+    // Pruebas adicionales de los métodos Front() y Back() con lista reducida
+    myLinkedList.Front(); // Devuelve el primer elemento actual (Inicio)
+    myLinkedList.Back();  // Devuelve el último elemento actual (Inicio)
 
-    // elimina los nodos con los valores indicados uno por uno
-    myLinkedList.BorrarNodoPorValor("Juan");   // borra el nodo con valor "Juan"
-    myLinkedList.BorrarNodoPorValor("Luis");   // borra "Luis"
-    myLinkedList.BorrarNodoPorValor("Maria");  // borra "Maria"
-    myLinkedList.BorrarNodoPorValor("Pepe");   // borra "Pepe"
-    myLinkedList.BorrarNodoPorValor("Pedro");  // borra "Pedro"
-
-    myLinkedList.Front();                      // intenta acceder al primer nodo 
-    myLinkedList.Back();                       // intenta acceder al último nodo
-
-    myLinkedList.LiberarMemoria();             // libera la memoria de los nodos restantes (si hubiera)
+    // No se llama a LiberarMemoria() manualmente porque el destructor la libera automáticamente
+    // cuando el objeto myLinkedList termina su tiempo de vida (al salir de la función)
 }
