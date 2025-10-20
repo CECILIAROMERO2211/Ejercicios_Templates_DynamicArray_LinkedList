@@ -3,217 +3,214 @@
 // Profesor: Adrián González
 // Universidad Cuauhtémoc Querétaro
 
-#pragma once                 // evita que el archivo se incluya más de una vez al compilar
-#include <iostream>          // biblioteca estándar para usar cout y endl
-using namespace std;         // evita escribir std:: antes de cout o string
+#pragma once // Evita que este archivo se incluya más de una vez durante la compilación
+#include <iostream> // Permite usar cout, endl, etc.
+using namespace std; // Facilita el uso de elementos de la biblioteca estándar
 
-// clase plantilla (template) para que la lista pueda usar cualquier tipo de dato (int, string, etc.)
+// Declaramos una clase genérica (template) que puede almacenar cualquier tipo de dato
 template <typename T>
 class LinkedList
 {
-public:                      // seccion pública: funciones accesibles desde fuera de la clase
+public: // Sección pública: métodos accesibles desde fuera de la clase
 
-    // constructor: inicializa la lista vacía
+    // Constructor: inicializa la lista vacía
     LinkedList()
     {
-        count = 0;           // al inicio la lista no tiene elementos
-        first = nullptr;     // el primer nodo apunta a nada (lista vacía)
+        count = 0; // Número de nodos empieza en 0
+        first = nullptr; // No hay nodos todavía, por lo tanto el puntero apunta a null
     }
 
-    // agrega un elemento al final de la lista (alias de Append)
+    // Destructor automático: se ejecuta cuando el objeto deja de existir
+    // Sirve para liberar memoria sin necesidad de llamar manualmente a LiberarMemoria()
+    ~LinkedList()
+    {
+        LiberarMemoria(); // Llama a la función que libera todos los nodos
+    }
+
+    // Inserta un elemento al final de la lista (igual que Append)
     void PushBack(const T value)
     {
-        Append(value);       // simplemente llama a la función Append
+        Append(value); // Llama internamente a Append para agregar al final
     }
 
-    // agrega un elemento al final de la lista
+    // Agrega un nuevo nodo al final de la lista
     void Append(const T value)
     {
-        if (first == nullptr)            // si la lista está vacía
+        if (first == nullptr) // Si la lista está vacía
         {
-            first = new Node(value);     // crea un nuevo nodo y lo asigna como primero
-            count++;                     // aumenta el contador de elementos
-            return;                      // termina la función
+            first = new Node(value); // Crea el primer nodo con el valor dado
+            count++; // Aumenta el contador de elementos
+            return; // Termina la función
         }
 
-        Node* nodoActual = first;        // comienza desde el primer nodo
-        while (nodoActual->next != nullptr) // recorre hasta llegar al último nodo
+        // Si ya hay elementos, recorre hasta el último nodo
+        Node* nodoActual = first;
+        while (nodoActual->next != nullptr)
             nodoActual = nodoActual->next;
 
-        Node* nuevoNodo = new Node(value); // crea un nuevo nodo con el valor dado
-        nodoActual->next = nuevoNodo;      // enlaza el nuevo nodo al final
-        count++;                           // incrementa la cantidad de elementos
+        // Crea un nuevo nodo y lo enlaza al final
+        Node* nuevoNodo = new Node(value);
+        nodoActual->next = nuevoNodo;
+        count++; // Aumenta el total de nodos
     }
 
-    // inserta un nodo nuevo después de un valor específico
+    // Inserta un nodo después de otro que tenga un valor específico
     bool InsertAfterValue(T valorAEncontrar, T valorAInsertar)
     {
-        Node* nodoActual = first;          // inicia desde el primer nodo
-        while (nodoActual != nullptr)      // recorre la lista
+        Node* nodoActual = first; // Empieza desde el primer nodo
+        while (nodoActual != nullptr) // Recorre toda la lista
         {
-            if (nodoActual->data == valorAEncontrar) // si encuentra el valor buscado
+            if (nodoActual->data == valorAEncontrar) // Si el nodo actual tiene el valor buscado
             {
-                Node* newNode = new Node(valorAInsertar); // crea un nuevo nodo con el valor a insertar
-                newNode->next = nodoActual->next;         // conecta el nuevo nodo al siguiente del actual
-                nodoActual->next = newNode;               // conecta el nodo actual con el nuevo
-                count++;                                  // aumenta el contador
-                return true;                              // devuelve true porque se insertó con éxito
+                Node* newNode = new Node(valorAInsertar); // Crea un nuevo nodo
+                newNode->next = nodoActual->next; // El nuevo nodo apunta al siguiente del actual
+                nodoActual->next = newNode; // Y el nodo actual apunta al nuevo
+                count++; // Aumenta el contador
+                return true; // Inserción exitosa
             }
-            nodoActual = nodoActual->next;                // pasa al siguiente nodo
+            nodoActual = nodoActual->next; // Avanza al siguiente nodo
         }
-        cout << "Advertencia: no existe el valor " << valorAEncontrar << endl; // si no lo encuentra, avisa
-        return false;                                     // devuelve false si no se insertó nada
+
+        // Si no se encontró el valor, muestra advertencia
+        cout << "Advertencia: no existe el valor " << valorAEncontrar << endl;
+        return false; // Inserción fallida
     }
 
-    // elimina un nodo que tenga un valor específico
+    // Elimina un nodo que contenga el valor indicado
     bool BorrarNodoPorValor(const T valorDelNodoABorrar)
     {
-        if (count == 0)                                   // si la lista está vacía
+        if (count == 0) // Si la lista está vacía
         {
             cout << "Advertencia: lista vacía." << endl;
-            return false;                                 // no hay nada que borrar
+            return false; // No se puede borrar nada
         }
 
-        Node* nodoActual = first;                         // empieza desde el primer nodo
-        if (nodoActual->data == valorDelNodoABorrar)      // si el primer nodo es el que se va a borrar
+        Node* nodoActual = first; // Empezamos desde el inicio
+
+        // Si el primer nodo tiene el valor buscado
+        if (nodoActual->data == valorDelNodoABorrar)
         {
-            first = nodoActual->next;                     // el segundo nodo pasa a ser el primero
-            delete nodoActual;                            // se libera el nodo eliminado
-            count--;                                      // se reduce el contador
-            return true;                                  // operación exitosa
+            first = nodoActual->next; // El primer nodo ahora será el siguiente
+            delete nodoActual; // Liberamos la memoria del nodo borrado
+            count--; // Reducimos el contador
+            return true; // Éxito
         }
 
-        // si el nodo a borrar no es el primero
-        while (nodoActual->next != nullptr)               // recorre toda la lista
+        // Recorre los nodos buscando el valor
+        while (nodoActual->next != nullptr)
         {
-            if (nodoActual->next->data == valorDelNodoABorrar) // si el siguiente nodo tiene el valor a borrar
+            if (nodoActual->next->data == valorDelNodoABorrar) // Si el siguiente nodo tiene el valor
             {
-                Node* nodoABorrar = nodoActual->next;          // guarda la dirección del nodo a borrar
-                nodoActual->next = nodoActual->next->next;     // salta el nodo borrado
-                delete nodoABorrar;                            // libera la memoria del nodo
-                count--;                                       // disminuye el contador
-                return true;                                   // regresa true porque se borró con éxito
+                Node* nodoABorrar = nodoActual->next; // Guardamos referencia del nodo a eliminar
+                nodoActual->next = nodoActual->next->next; // Saltamos ese nodo en la lista
+                delete nodoABorrar; // Liberamos la memoria del nodo eliminado
+                count--; // Reducimos el contador
+                return true; // Nodo eliminado correctamente
             }
-            nodoActual = nodoActual->next;                     // avanza al siguiente nodo
+            nodoActual = nodoActual->next; // Avanza al siguiente nodo
         }
 
-        cout << "Advertencia: no existe el valor " << valorDelNodoABorrar << endl; // si no lo encuentra
-        return false;                                         // no se borró nada
+        // Si no se encontró el valor, mostramos advertencia
+        cout << "Advertencia: no existe el valor " << valorDelNodoABorrar << endl;
+        return false; // No se borró nada
     }
 
-    // devuelve el valor del primer nodo de la lista
+    // Devuelve el valor que está al frente (primer nodo)
     T Front()
     {
-        if (first != nullptr)            // si la lista no está vacía
-            return first->data;          // devuelve el dato del primer nodo
+        if (first != nullptr) // Si hay al menos un nodo
+            return first->data; // Devuelve el valor del primer nodo
+
         cout << "Advertencia: Front lista vacía." << endl;
-        return T{};                      // devuelve un valor vacío del tipo genérico
+        return T{}; // Devuelve valor vacío (según el tipo)
     }
 
-    // devuelve el valor del último nodo
+    // Devuelve el valor del último nodo de la lista
     T Back()
     {
-        if (count == 0)                  // si la lista está vacía
+        if (count == 0) // Si la lista está vacía
         {
             cout << "Advertencia: Back lista vacía." << endl;
-            return T{};                  // devuelve un valor vacío
+            return T{}; // Devuelve valor vacío
         }
 
-        Node* nodoActual = first;        // empieza desde el primer nodo
-        while (nodoActual->next != nullptr) // recorre hasta el último nodo
+        Node* nodoActual = first; // Comienza en el primer nodo
+        while (nodoActual->next != nullptr) // Avanza hasta el último
             nodoActual = nodoActual->next;
-        return nodoActual->data;         // devuelve el valor del último nodo
+
+        return nodoActual->data; // Devuelve el valor del último nodo
     }
 
-    // obtiene un valor por su índice (posición)
-    T GetByIndex(const size_t indice) const
-    {
-        if (indice >= count)             // si el índice es mayor al tamaño de la lista
-        {
-            cout << "Error: índice inválido." << endl;
-            return T{};                  // devuelve un valor vacío
-        }
-
-        Node* nodoActual = first;        // comienza desde el primer nodo
-        for (int i = 0; i < indice; i++) // avanza hasta el índice indicado
-            nodoActual = nodoActual->next;
-        return nodoActual->data;         // devuelve el dato del nodo en esa posición
-    }
-
-    // inserta un nuevo nodo al principio de la lista
+    // Inserta un elemento al principio de la lista
     void PushFront(const T value)
     {
-        Node* nuevoNodo = new Node(value); // crea un nuevo nodo con el valor dado
-
-        if (first == nullptr)              // si la lista está vacía
-            nuevoNodo->next = nullptr;     // su siguiente apunta a nada
-        else
-            nuevoNodo->next = first;       // si no, lo conecta al nodo que antes era primero
-
-        first = nuevoNodo;                 // el nuevo nodo se vuelve el primer nodo
-        count++;                           // aumenta el número de elementos
+        Node* nuevoNodo = new Node(value); // Crea un nuevo nodo con el valor dado
+        nuevoNodo->next = first; // Hace que el nuevo nodo apunte al primero actual
+        first = nuevoNodo; // El nuevo nodo se convierte en el primero
+        count++; // Aumenta el total de elementos
     }
 
-    // elimina el nodo que está al principio de la lista
+    // Elimina el primer nodo de la lista
     void PopFront()
     {
-        if (first == nullptr)              // si la lista está vacía
+        if (first == nullptr) // Si la lista está vacía
         {
             cout << "Advertencia: PopFront lista vacía." << endl;
-            return;                        // no hay nada que borrar
+            return; // No hay nada que eliminar
         }
 
-        Node* nodoABorrar = first;         // guarda el nodo que se va a eliminar
-        first = first->next;               // el segundo nodo pasa a ser el primero
-        delete nodoABorrar;                // libera la memoria del nodo eliminado
-        count--;                           // disminuye el contador de elementos
+        Node* nodoABorrar = first; // Guardamos el primer nodo
+        first = first->next; // Avanzamos el inicio al siguiente nodo
+        delete nodoABorrar; // Liberamos la memoria del nodo borrado
+        count--; // Disminuye el total de nodos
     }
 
-    // imprime todos los elementos de la lista en consola
+    // Imprime todos los valores de la lista
     void Print()
     {
-        cout << "Imprimiendo lista: ";     // texto informativo
-        Node* actual = first;              // comienza desde el primer nodo
-        while (actual != nullptr)          // recorre la lista completa
+        cout << "Imprimiendo lista: ";
+        Node* actual = first; // Comienza desde el primer nodo
+        while (actual != nullptr) // Mientras haya nodos
         {
-            cout << actual->data << " ";   // imprime el valor del nodo actual
-            actual = actual->next;         // avanza al siguiente nodo
+            cout << actual->data << " "; // Imprime el valor actual
+            actual = actual->next; // Avanza al siguiente
         }
-        cout << endl;                      // salto de línea al final
+        cout << endl; // Salto de línea al final
     }
 
-    // libera toda la memoria de los nodos (elimina toda la lista)
+    // Libera toda la memoria usada por la lista
     void LiberarMemoria()
     {
-        Node* actual = first;              // empieza desde el primer nodo
-        while (actual != nullptr)          // mientras existan nodos
+        Node* actual = first; // Comienza desde el primer nodo
+        while (actual != nullptr) // Mientras haya nodos
         {
-            Node* temp = actual;           // guarda el nodo actual
-            actual = actual->next;         // avanza al siguiente nodo
-            delete temp;                   // libera el nodo guardado
+            Node* temp = actual; // Guarda el nodo actual en una variable temporal
+            actual = actual->next; // Avanza al siguiente nodo
+            delete temp; // Libera el nodo actual
         }
-        first = nullptr;                   // el puntero al primer nodo se vacía
-        count = 0;                         // contador vuelve a cero
-        cout << "Memoria liberada correctamente." << endl; // mensaje de confirmación
+        first = nullptr; // Vuelve el puntero inicial a vacío
+        count = 0; // Reinicia el contador
     }
 
-private:                                   // sección privada, no accesible desde fuera
-    // clase interna que representa cada nodo individual de la lista
+private: // Sección privada: solo accesible desde dentro de la clase
+
+    // Clase interna Node: representa cada elemento de la lista
     class Node
     {
     public:
-        Node(T _data)                      // constructor del nodo
+        Node(T _data) // Constructor del nodo
         {
-            data = _data;                  // guarda el valor del nodo
-            next = nullptr;                // apunta a nada inicialmente
+            data = _data; // Guarda el dato dentro del nodo
+            next = nullptr; // Inicialmente no apunta a nadie
         }
-        T data;                            // almacena el dato dentro del nodo
-        Node* next;                        // puntero al siguiente nodo
+
+        T data; // Valor almacenado dentro del nodo
+        Node* next; // Puntero al siguiente nodo
     };
 
-    Node* first;                           // puntero que apunta al primer nodo de la lista
-    int count;                             // cantidad total de nodos en la lista
+    Node* first; // Apunta al primer nodo de la lista
+    int count; // Lleva el conteo de cuántos nodos hay
 };
 
-// declaración de la función de demostración para probar la lista
+// Declaración de la función externa para demostrar la lista enlazada
 void DemostracionLinkedList();
