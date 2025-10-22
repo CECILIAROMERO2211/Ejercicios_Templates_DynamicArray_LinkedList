@@ -3,233 +3,242 @@
 // Profesor: Adrián González
 // Universidad Cuauhtémoc Querétaro
 
-#include "DynamicArray.h" // Incluye el archivo de encabezado con la definición de la clase
+#include "DynamicArray.h" // Incluye el archivo de encabezado con la definición de la clase DynamicArray
 #include <iostream>       // Permite usar cout, endl, etc.
-using namespace std;      // Evita tener que escribir std:: en cada línea
+using namespace std;      // Simplifica el uso del espacio de nombres estándar
 
 // Constructor: inicializa el arreglo con una capacidad dada o vacía
 DynamicArray::DynamicArray(int capacity)
 {
     this->capacity = capacity; // Guarda el valor de capacidad
-    count = 0;                 // Inicializa el número de elementos en cero
+    count = 0;                 // Inicialmente el arreglo está vacío
 
 #if COUNT_DYNAMIC_ARRAY_COPIES != 0
-    copyCounter = 0;           // Inicializa el contador de copias si está activado
+    copyCounter = 0;           // Si la opción está activa, inicializa el contador de copias
 #endif
 
-    // Si la capacidad es mayor que cero, reserva memoria dinámica
-    if (capacity > 0)
-        elements = new int[capacity];
+    if (capacity > 0)          // Si la capacidad es mayor que 0
+        elements = new int[capacity]; // Se reserva memoria dinámica
     else
-        elements = nullptr;    // Si no, deja el puntero vacío
+        elements = nullptr;    // Si no, el puntero se deja vacío
 }
 
-// Destructor: libera la memoria cuando el objeto deja de existir
+// Destructor: libera la memoria ocupada por el arreglo dinámico
 DynamicArray::~DynamicArray()
 {
-    if (elements != nullptr)   // Verifica que haya memoria reservada
+    if (elements != nullptr)   // Si hay memoria reservada
     {
         delete[] elements;     // Libera el bloque de memoria
-        elements = nullptr;    // Evita que el puntero quede colgando
+        elements = nullptr;    // Evita punteros colgantes
     }
 }
 
-// Agrega un nuevo elemento al final del arreglo
+// Agrega un nuevo valor al final del arreglo
 void DynamicArray::Append(const int value)
 {
-    // Si el número de elementos alcanza la capacidad, hay que redimensionar
+    // Si no hay espacio suficiente, se redimensiona el arreglo
     if (count >= capacity)
     {
-        int newCapacity = (capacity == 0) ? 1 : capacity * 2; // Duplica la capacidad o inicia con 1
-
-        // Si la nueva capacidad sobrepasa el máximo permitido, se detiene
-        if (newCapacity > maxCapacity)
+        int newCapacity = (capacity == 0) ? 1 : capacity * 2; // Duplica o inicia en 1
+        if (newCapacity > maxCapacity) // Evita sobrepasar el límite máximo
         {
             cout << "advertencia: se alcanzó la capacidad máxima" << endl;
             return;
         }
 
-        // Crea un nuevo arreglo temporal con la nueva capacidad
+        // Se crea un nuevo arreglo con mayor capacidad
         int* newArray = new int[newCapacity];
-
-        // Copia los elementos del arreglo viejo al nuevo
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++) // Copia todos los elementos anteriores
         {
 #if COUNT_DYNAMIC_ARRAY_COPIES != 0
-            copyCounter++;     // Aumenta el contador de copias por cada elemento copiado
+            copyCounter++; // Aumenta el contador de copias
 #endif
-            newArray[i] = elements[i]; // Copia cada elemento
+            newArray[i] = elements[i];
         }
 
-        delete[] elements;     // Libera la memoria anterior
-        elements = newArray;   // Cambia el puntero al nuevo arreglo
-        capacity = newCapacity; // Actualiza la capacidad total
+        delete[] elements; // Libera el arreglo viejo
+        elements = newArray; // Reemplaza con el nuevo
+        capacity = newCapacity; // Actualiza la capacidad
     }
 
-    // Inserta el nuevo valor en la siguiente posición disponible
-    elements[count] = value;
-    count++; // Aumenta el número de elementos almacenados
+    elements[count] = value; // Agrega el nuevo elemento
+    count++; // Aumenta el contador de elementos
 }
 
-// Inserta un nuevo valor después de un valor específico
+// Inserta un valor después de otro existente
 bool DynamicArray::InsertarDespuesDeValor(int valorAEncontrar, int valorAInsertar)
 {
-    // Recorre el arreglo para encontrar el valor indicado
-    for (int i = 0; i < count; i++)
+    for (int i = 0; i < count; i++) // Recorre el arreglo
     {
         if (elements[i] == valorAEncontrar) // Si encuentra el valor buscado
         {
-            if (count >= capacity) // Si el arreglo está lleno
+            if (count >= capacity) // Si está lleno
             {
-                Append(valorAInsertar); // Usa Append para agregar al final
+                Append(valorAInsertar); // Llama a Append para expandir y agregar
                 return true;
             }
 
-            // Recorre los elementos hacia la derecha para hacer espacio
+            // Desplaza los elementos hacia la derecha
             for (int j = count; j > i + 1; j--)
                 elements[j] = elements[j - 1];
 
-            // Inserta el nuevo valor justo después del encontrado
-            elements[i + 1] = valorAInsertar;
-            count++; // Aumenta el número total de elementos
+            elements[i + 1] = valorAInsertar; // Inserta el nuevo valor
+            count++; // Aumenta el total
             return true;
         }
     }
-
-    // Si el valor no se encontró, muestra advertencia
     cout << "advertencia: no existe el valor " << valorAEncontrar << endl;
-    return false; // Devuelve falso si no se hizo la inserción
+    return false; // Si no lo encuentra
 }
 
-// Devuelve el elemento que se encuentra en un índice específico
+// Devuelve el elemento en un índice específico
 int DynamicArray::ObtenerElemento(const size_t indice) const
 {
-    // Si el índice es inválido, muestra error
-    if (indice >= count)
+    if (indice >= count) // Si está fuera de rango
     {
         cout << "error: índice fuera de rango" << endl;
-        return -1; // Retorna -1 como valor de error
+        return -1; // Retorna error
     }
-    return elements[indice]; // Devuelve el elemento correspondiente
+    return elements[indice]; // Devuelve el elemento
 }
 
-// Cambia el valor en una posición específica del arreglo
+// Asigna un nuevo valor a un índice
 void DynamicArray::AsignarElemento(const size_t indice, const int valor)
 {
-    // Verifica que el índice sea válido
-    if (indice >= count)
+    if (indice >= count) // Verifica que exista
     {
         cout << "error: índice fuera de rango" << endl;
-        return; // Termina la función sin hacer nada
+        return;
     }
-
-    elements[indice] = valor; // Asigna el nuevo valor al índice indicado
+    elements[indice] = valor; // Cambia el valor
 }
 
-// Busca un valor dentro del arreglo y devuelve su posición
+// Busca un valor dentro del arreglo
 int DynamicArray::BuscarElemento(const int valor) const
 {
-    // Recorre todos los elementos para buscar coincidencia
     for (int i = 0; i < count; i++)
     {
-        if (elements[i] == valor) // Si encuentra el valor
-            return i;             // Devuelve su posición
+        if (elements[i] == valor)
+            return i; // Devuelve la posición
     }
-    return -1; // Si no lo encuentra, devuelve -1
+    return -1; // Si no se encuentra
 }
 
-// Elimina el último elemento del arreglo
+// Elimina el último elemento y devuelve su valor
 int DynamicArray::QuitarUltimoElemento()
 {
     if (count == 0) // Si el arreglo está vacío
     {
         cout << "advertencia: arreglo vacío" << endl;
-        return -1; // No hay nada que eliminar
+        return -1;
     }
-
-    count--; // Disminuye el conteo de elementos
-    return elements[count]; // Devuelve el valor eliminado
+    count--; // Reduce el contador
+    return elements[count]; // Devuelve el elemento eliminado
 }
 
-// Devuelve el número actual de elementos en el arreglo
+// Devuelve cuántos elementos tiene actualmente
 int DynamicArray::GetCount() const
 {
-    return count; // Retorna el valor de la variable count
+    return count; // Retorna el número total de elementos
 }
 
-// Imprime todos los elementos almacenados
+// Imprime todos los elementos del arreglo
 void DynamicArray::Print() const
 {
-    cout << "elementos del arreglo: "; // Texto previo
-    for (int i = 0; i < count; i++)    // Recorre cada elemento
-        cout << elements[i] << " ";    // Imprime cada valor con un espacio
-    cout << endl;                      // Salto de línea al final
+    cout << "elementos del arreglo: ";
+    for (int i = 0; i < count; i++) // Recorre cada elemento
+        cout << elements[i] << " "; // Lo imprime separado por espacios
+    cout << endl;
 }
 
-// Sobrecarga del operador [] para acceder a los elementos directamente
+// Sobrecarga del operador [] para acceder como un arreglo normal
 int& DynamicArray::operator[](int index)
 {
-    // Verifica que el índice sea válido
-    if (index < 0 || index >= count)
+    if (index < 0 || index >= count) // Verifica límites válidos
     {
         cout << "error: índice fuera de rango" << endl;
-        exit(1); // Termina el programa si el índice es inválido
+        exit(1); // Detiene el programa en caso de error
     }
-    return elements[index]; // Devuelve referencia al elemento
+    return elements[index]; // Devuelve referencia al valor
 }
 
-// Versión constante del operador [], para arreglos de solo lectura
+// Versión constante del operador []
 const int& DynamicArray::operator[](int index) const
 {
     if (index < 0 || index >= count)
     {
         cout << "error: índice fuera de rango" << endl;
-        exit(1); // Termina el programa si hay error
+        exit(1);
     }
-    return elements[index]; // Devuelve referencia constante
+    return elements[index];
 }
 
 // Agrega un valor al final del arreglo (igual que Append)
 void DynamicArray::push_back(int value)
 {
-    Append(value); // Llama internamente a Append
+    Append(value); // Reutiliza la función Append
 }
 
-// Elimina el último elemento del arreglo sin devolverlo
+// Elimina el último valor del arreglo
 void DynamicArray::pop_back()
 {
     if (count > 0) // Si hay elementos
-        count--;   // Reduce el contador en uno
+        count--;   // Reduce el total
     else
-        cout << "advertencia: arreglo vacío" << endl; // Si no hay nada que borrar
+        cout << "advertencia: arreglo vacío" << endl;
 }
 
-// Ajusta la capacidad del arreglo al número exacto de elementos
+// Ajusta la capacidad al número exacto de elementos
 void DynamicArray::shrink_to_fit()
 {
-    // Esta función se deja vacía como parte de la práctica
+    // Si la capacidad es mayor al número real de elementos, se ajusta
+    if (capacity > count)
+    {
+        int* newArray = new int[count]; // Crea un arreglo exacto del tamaño actual
+        for (int i = 0; i < count; i++)
+            newArray[i] = elements[i]; // Copia los datos existentes
+
+        delete[] elements; // Libera la memoria anterior
+        elements = newArray; // Asigna el nuevo arreglo ajustado
+        capacity = count; // Actualiza la capacidad
+
+        cout << "shrink_to_fit(): capacidad ajustada al tamaño real (" << capacity << ")" << endl;
+    }
+    else
+    {
+        cout << "shrink_to_fit(): no se requiere ajuste" << endl;
+    }
 }
 
-// Función de demostración: muestra cómo usar DynamicArray
+// Demostración del uso del DynamicArray
 void DemostracionDynamicArray()
 {
-    DynamicArray myArray; // Crea un objeto DynamicArray vacío
+    DynamicArray myArray; // Crea un objeto de tipo DynamicArray
 
-    myArray.Append(10); // Agrega el número 10
-    myArray.Append(20); // Agrega el número 20
-    myArray.Append(30); // Agrega el número 30
+    myArray.Append(10); // Agrega valores de prueba
+    myArray.Append(20);
+    myArray.Append(30);
 
     cout << "elementos iniciales: ";
-    myArray.Print(); // Imprime los valores actuales
+    myArray.Print(); // Muestra los elementos
 
     myArray.push_back(40); // Agrega un nuevo valor al final
-    myArray.Print();       // Muestra el arreglo actualizado
+    myArray.Print();
 
-    myArray.pop_back(); // Elimina el último elemento
-    myArray.Print();    // Vuelve a mostrar el arreglo
+    myArray.pop_back(); // Elimina el último valor
+    myArray.Print();
 
-    // Accede al primer elemento con el operador []
-    cout << "primer elemento con operador []: " << myArray[0] << endl;
-
-    myArray.shrink_to_fit(); // Llama a la función vacía (solo demostración)
+    cout << "primer elemento con operador []: " << myArray[0] << endl; // Muestra acceso con operador []
+    myArray.shrink_to_fit(); // Ajusta la capacidad al tamaño real
 }
+
+// Fuentes consultadas:
+// CodeBeauty. (2021, 17 de julio). Dynamic Arrays in C++ (how they work, resize, and manage memory). [Video]. YouTube. 
+// https://www.youtube.com/watch?v=PocJ5jXv8No
+// Contenido: Minuto 04:10 a 07:45. Explica cómo redimensionar arreglos dinámicos y gestionar memoria con new[] y delete[],
+// lo cual fue aplicado en la función shrink_to_fit() para optimizar el uso de memoria dinámica.
+//
+// Geek’s Lesson. (2020, 8 de mayo). Use push_back and pop_back with vectors in C++. [Video]. YouTube. 
+// https://www.youtube.com/watch?v=opAnlfre-Kw
+// Contenido: Minuto 01:00 a 03:20. Muestra el funcionamiento de las funciones push_back() y pop_back() 
+// en los vectores del STL, las cuales fueron replicadas manualmente dentro de esta clase.
